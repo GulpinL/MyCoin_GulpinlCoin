@@ -1,0 +1,1 @@
+console.log("Hello\'meme\'   \tMe : \\la\\la\\la")
