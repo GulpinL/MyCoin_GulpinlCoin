@@ -2,24 +2,38 @@ const hashSHA256=require('crypto-js/sha256');
 
 
 class Block{
-    constructor(index, timeStamp, data, prevHash = ''){
-        this.index = index;
+    constructor( timeStamp, transactions, prevHash = ''){
         this.prevHash = prevHash;
-        this.data = data;
+        this.transactions = transactions;
         this.timeStamp = timeStamp;
 
         this.hash=this.calculateHash();
+        this.nonce=0;// ?
     }
 
     calculateHash(){
-        return hashSHA256(this.index+this.prevHash+JSON.stringify(this.data)+this.timeStamp).toString();
+        return hashSHA256(this.prevHash+JSON.stringify(this.transactions)+this.timeStamp+this.nonce).toString();
     }
-}
 
+    mineBlock(difficulty) {// += calculateHash() // using Proof of work // increase dif when a block is added to blockchain
+        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
+          this.nonce++;
+          this.hash = this.calculateHash(); 
+        }
+        console.log("Block mined: "+this.hash)
+        // HOW to decrease dif
+} 
+}
 class Blockchain{
     constructor(){
         this.chain=[this.createGenesisBlock_firstBlock()];
+        this.difficulty=4;
     }
+
+    // constructor(difficulty){
+    //     this.chain=[this.createGenesisBlock_firstBlock()];
+    //     this.difficulty=difficulty;
+    // }
 
     createGenesisBlock_firstBlock(){
         return new Block(0,'18/6/2022',"Hello world",'0')
@@ -31,7 +45,10 @@ class Blockchain{
 
     addBlock(newBlock){
         newBlock.prevHash=this.getLatestBlock().hash // gan chuoi hash vao block
-        newBlock.hash=newBlock.calculateHash()
+        // newBlock.hash=newBlock.calculateHash()
+        console.log("start : Mining")
+        newBlock.mineBlock(this.difficulty)
+        // console.log("end Mining: ",newblock)
         this.chain.push(newBlock)
     }
 
@@ -55,28 +72,27 @@ class Blockchain{
     }
 }
 
-let SalCoin=new Blockchain();
-SalCoin.addBlock(new Block(1,"10/7/2022",{amount:10, message:'Long give Giang amount: '}))
-SalCoin.addBlock(new Block(2,"10/7/1999",{amount:1111, message:'Long give Chien amount: '}))
-SalCoin.addBlock(new Block(3,"10/7/21999",{amount:2222, message:'Long give Chien amount: '}))
-console.log(JSON.stringify(SalCoin,null,4));
-console.log('Chain valid: ',SalCoin.isChainValid())
+let savjeeCoin=new Blockchain();
 
-// const currentBlock_ = LongCoin.chain[2];
+console.log("Mining block 1...");
+savjeeCoin.addBlock(new Block(1,"10/7/2015",{amount:10}))
 
-// const prevBlock_=LongCoin.chain[2-1];
+console.log("Mining block 2...");``
+savjeeCoin.addBlock(new Block(2,"1/1/2017",{amount:10}))
 
-// console.log("2 Block dang xem xet:",currentBlock_,prevBlock_);
+console.log("Mining block 3...");``
+savjeeCoin.addBlock(new Block(3,"1/1/2000",{amount:1011}))
 
-// console.log(currentBlock_.prevHash!=prevBlock_.hash)
+console.log("Mining block 4...");``
+savjeeCoin.addBlock(new Block(4,"1/1/1999",{amount:369}))
 
+// savjeeCoin.addBlock(new Block(1,"10/7/2022",{amount:10, message:'Long give Giang amount: '}))
+// savjeeCoin.addBlock(new Block(2,"10/7/1999",{amount:1111, message:'Long give Chien amount: '}))
+// savjeeCoin.addBlock(new Block(3,"10/7/21999",{amount:2222, message:'Long give Chien amount: '}))
+// console.log(JSON.stringify(savjeeCoin,null,4));
+console.log('Chain valid: ',savjeeCoin.isChainValid())
 
-
-// console.log('6ee37b06b9addcde9a0413497a7d89e78d8c20a466c8dcf8e3903593344c5866'=='6ee37b06b9addcde9a0413497a7d89e78d8c20a466c8dcf8e3903593344c5866')
-// console.log(JSON.stringify(LongCoin,null,4));
-// console.log('Chain valid: ',LongCoin.isChainValid())
-
-SalCoin.chain[1].data={amount:99}
-SalCoin.chain[1].hash=SalCoin.chain[1].calculateHash()
-console.log(JSON.stringify(SalCoin,null,4));
-console.log('Chain valid: ',SalCoin.isChainValid())
+// savjeeCoin.chain[1].data={amount:99}
+// savjeeCoin.chain[1].hash=savjeeCoin.chain[1].calculateHash()
+// console.log(JSON.stringify(savjeeCoin,null,4));
+// console.log('Chain valid: ',savjeeCoin.isChainValid())
