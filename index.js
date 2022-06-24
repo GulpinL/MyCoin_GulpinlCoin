@@ -32,6 +32,7 @@ class Block{
        
 } 
 }
+
 class Blockchain{
     constructor(){
         this.chain=[this.createGenesisBlock_firstBlock()];
@@ -56,7 +57,7 @@ class Blockchain{
     }
     
     minePendingTransactions(miningRewardAddress){                       // ??? can they change to get more rewards
-        let block=new Block(Date.now(),this.pendingTransactions)
+        let block=new Block(Date.now(),this.pendingTransactions)        // ??? if miner get conflict to each other -> how to solve
         console.log("start : Mining")
         block.mineBlock(this.difficulty)
         // console.log("block successfully mined")
@@ -70,6 +71,15 @@ class Blockchain{
 
     createTransaction(Transaction){
         this.pendingTransactions.push(Transaction)
+    }
+
+    getBalance(TransactionAddress){
+        let amountWallet=0
+        for(let i=1;i<this.chain.length;i++){
+            if(TransactionAddress===this.pendingTransactions[i].Transaction.toAddress)
+            amountWallet+=this.pendingTransactions[i].Transaction.amount
+            const currentBlock = this.chain[i];// thieu phan tru 
+    }
     }
 
     isChainValid(){
@@ -91,6 +101,11 @@ class Blockchain{
         return isValid;
     }
 }
+
+
+
+
+
 
 let savjeeCoin=new Blockchain();
 
