@@ -1,14 +1,5 @@
 const hashSHA256=require('crypto-js/sha256');
 
-class Transaction{
-    constructor(fromAddress, toAddress, amount){//lack of sign transaction aka Public private key
-        this.fromAddress=fromAddress;
-        this.toAddress=toAddress;
-        this.amount=amount;
-    }
-
-
-}
 class Block{
     constructor( timeStamp, transactions, prevHash = ''){
         this.prevHash = prevHash;
@@ -36,7 +27,7 @@ class Block{
 class Blockchain{
     constructor(){
         this.chain=[this.createGenesisBlock_firstBlock()];
-        this.difficulty=4;
+        this.difficulty=3;
         this.pendingTransactions=[];                                    // ??? equal to pool
         this.miningReward=1000;                                         // !!! How to share mining reward
     }
@@ -48,38 +39,41 @@ class Blockchain{
     getLatestBlock(){
         return this.chain[this.chain.length - 1];
     }
-
-    addBlock(newBlock){
-        newBlock.prevHash=this.getLatestBlock().hash                    // gan chuoi hash vao block
-        console.log("start : Mining")
-        newBlock.mineBlock(this.difficulty)
-        this.chain.push(newBlock)
-    }
     
-    minePendingTransactions(miningRewardAddress){                       // ??? can they change to get more rewards
-        let block=new Block(Date.now(),this.pendingTransactions)        // ??? if miner get conflict to each other -> how to solve
-        console.log("start : Mining")
-        block.mineBlock(this.difficulty)
-        // console.log("block successfully mined")
-
-        this.chain.push(block)
+    minePendingTransactions(miningRewardAddress){   //OLD version : addBlock                    // ??? can they change to get more rewards
         this.pendingTransactions=[
             new Transaction(null,miningRewardAddress,this.miningReward)// aka he thong chuyen tien cho ban => he thong khong co address, toAddress la miner vaf mine Reward = amount
         ]
+        let block=new Block(Date.now(),this.pendingTransactions,this.getLatestBlock().hash)        // ??? if miner get conflict to each other -> how to solve // 
+        console.log("Block mining ... pendingTransactions mining ... ")
+        block.mineBlock(this.difficulty)
+        this.chain.push(block)
+        this.pendingTransactions=[];
 
     }
 
-    createTransaction(Transaction){
+    createTransaction(Transaction){                                     // !!! chua gioi han so lan transaction trong appending transactions
         this.pendingTransactions.push(Transaction)
     }
 
-    getBalance(TransactionAddress){
-        let amountWallet=0
-        for(let i=1;i<this.chain.length;i++){
-            if(TransactionAddress===this.pendingTransactions[i].Transaction.toAddress)
-            amountWallet+=this.pendingTransactions[i].Transaction.amount
-            const currentBlock = this.chain[i];// thieu phan tru 
-    }
+    getBalance(address){
+        let balance=0
+    //     for(let i=1;i<this.chain.length;i++){  // OLD CODE MY CODE
+    //         if(TransactionAddress===this.pendingTransactions[i].Transaction.toAddress)
+    //         amountWallet+=this.pendingTransactions[i].Transaction.amount
+    //         const currentBlock = this.chain[i];// thieu phan tru 
+    // }
+        for(const block of this.chain){
+            for(const trans of block.transactions){
+                if(trans.fromAddress===address){
+                    balance-=trans.amount
+                }
+                if(trans.toAddress===address){
+                    balance+=trans.amount
+                }
+            }
+        }
+        return balance
     }
 
     isChainValid(){
@@ -102,30 +96,39 @@ class Blockchain{
     }
 }
 
+class Transaction{
+    constructor(fromAddress, toAddress, amount){//lack of sign transaction aka Public private key
+        this.fromAddress=fromAddress;
+        this.toAddress=toAddress;
+        this.amount=amount;
+        // this.timeStamp=Date.now();
+    }
+}
+
 
 
 
 
 
 let savjeeCoin=new Blockchain();
+savjeeCoin.createTransaction(new Transaction('fromA','toB',10))
+savjeeCoin.createTransaction(new Transaction('fromC','toD',50))
+savjeeCoin.createTransaction(new Transaction('toB','fromA',13))
 
-console.log("Mining block 1...");
-savjeeCoin.addBlock(new Block(1,"10/7/2015",{amount:10}))
+console.log("\nSTART MINING ...\n");
+savjeeCoin.minePendingTransactions('long-wallet')                       //khi mine nhow bo dia chi miner vao aka public key cua miner
+console.log("\nGet Balance from address: Long wallet : \n",savjeeCoin.getBalance('long-wallet'))
 
-console.log("Mining block 2...");``
-savjeeCoin.addBlock(new Block(2,"1/1/2017",{amount:10}))
-
-console.log("Mining block 3...");``
-savjeeCoin.addBlock(new Block(3,"1/1/2000",{amount:1011}))
-
-console.log("Mining block 4...");``
-savjeeCoin.addBlock(new Block(4,"1/1/1999",{amount:369}))
-
-// savjeeCoin.addBlock(new Block(1,"10/7/2022",{amount:10, message:'Long give Giang amount: '}))
-// savjeeCoin.addBlock(new Block(2,"10/7/1999",{amount:1111, message:'Long give Chien amount: '}))
-// savjeeCoin.addBlock(new Block(3,"10/7/21999",{amount:2222, message:'Long give Chien amount: '}))
-// console.log(JSON.stringify(savjeeCoin,null,4));
+console.log("\nSTART MINING Again...\n");
+savjeeCoin.minePendingTransactions('long-wallet')                       //khi mine nhow bo dia chi miner vao aka public key cua miner
+console.log("\nGet Balance from address: Long wallet : \n",savjeeCoin.getBalance('long-wallet'))
 console.log('Chain valid: ',savjeeCoin.isChainValid())
+
+
+
+// for(let i=1;i<savjeeCoin.chain.length;i++){
+//     console.log("\n Hash: ",savjeeCoin.chain[i].hash)
+// }
 
 // savjeeCoin.chain[1].data={amount:99}
 // savjeeCoin.chain[1].hash=savjeeCoin.chain[1].calculateHash()
