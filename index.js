@@ -1,6 +1,14 @@
 const hashSHA256=require('crypto-js/sha256');
 
+class Transaction{
+    constructor(fromAddress, toAddress, amount){//lack of sign transaction aka Public private key
+        this.fromAddress=fromAddress;
+        this.toAddress=toAddress;
+        this.amount=amount;
+    }
 
+
+}
 class Block{
     constructor( timeStamp, transactions, prevHash = ''){
         this.prevHash = prevHash;
@@ -20,23 +28,20 @@ class Block{
           this.nonce++;
           this.hash = this.calculateHash(); 
         }
-        console.log("Block mined: "+this.hash)
-        // HOW to decrease dif
+        console.log("Block mined: "+this.hash)                          // !!! HOW to decrease dif
+       
 } 
 }
 class Blockchain{
     constructor(){
         this.chain=[this.createGenesisBlock_firstBlock()];
         this.difficulty=4;
+        this.pendingTransactions=[];                                    // ??? equal to pool
+        this.miningReward=1000;                                         // !!! How to share mining reward
     }
 
-    // constructor(difficulty){
-    //     this.chain=[this.createGenesisBlock_firstBlock()];
-    //     this.difficulty=difficulty;
-    // }
-
     createGenesisBlock_firstBlock(){
-        return new Block(0,'18/6/2022',"Hello world",'0')
+        return new Block('18/6/2022',"Hello world",'0')
     }
 
     getLatestBlock(){
@@ -44,12 +49,27 @@ class Blockchain{
     }
 
     addBlock(newBlock){
-        newBlock.prevHash=this.getLatestBlock().hash // gan chuoi hash vao block
-        // newBlock.hash=newBlock.calculateHash()
+        newBlock.prevHash=this.getLatestBlock().hash                    // gan chuoi hash vao block
         console.log("start : Mining")
         newBlock.mineBlock(this.difficulty)
-        // console.log("end Mining: ",newblock)
         this.chain.push(newBlock)
+    }
+    
+    minePendingTransactions(miningRewardAddress){                       // ??? can they change to get more rewards
+        let block=new Block(Date.now(),this.pendingTransactions)
+        console.log("start : Mining")
+        block.mineBlock(this.difficulty)
+        // console.log("block successfully mined")
+
+        this.chain.push(block)
+        this.pendingTransactions=[
+            new Transaction(null,miningRewardAddress,this.miningReward)// aka he thong chuyen tien cho ban => he thong khong co address, toAddress la miner vaf mine Reward = amount
+        ]
+
+    }
+
+    createTransaction(Transaction){
+        this.pendingTransactions.push(Transaction)
     }
 
     isChainValid(){
