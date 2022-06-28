@@ -1,0 +1,28 @@
+{
+  "name": "coin_codedao",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "crypto-js": "^4.1.1",
+    "elliptic": "^6.5.4",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.18"
+  },
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GulpinL/MyCoin_GulpinlCoin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GulpinL/MyCoin_GulpinlCoin/issues"
+  },
+  "homepage": "https://github.com/GulpinL/MyCoin_GulpinlCoin#readme"
+}
